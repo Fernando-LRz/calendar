@@ -1,10 +1,13 @@
-import { addHours } from 'date-fns';
-import { useState } from 'react';
+import { addHours, differenceInSeconds } from 'date-fns';
+import { useEffect, useMemo, useState } from 'react';
 
 import Modal from 'react-modal';
 import DatePicker from 'react-datepicker';
+import Swal from 'sweetalert2'
 
 import 'react-datepicker/dist/react-datepicker.css';
+
+import { useCalendarStore, useUiStore } from '../../hooks';
 
 const customStyles = {
     content: {
@@ -21,36 +24,71 @@ Modal.setAppElement('#root');
 
 export const CalendarModal = () => {
 
-    const [ isOpen, setIsOpen ] = useState(true);
+    const { isDateModalOpen, closeDateModal } = useUiStore();
+    const { activeEvent } = useCalendarStore();
+
+    const [ formSubmitted, setFormSubmitted ] = useState(false);
     const [ formValues, setFormValues ] = useState({
         title: '',
         notes: '',
         start: new Date(),
-        end: addHours(new Date(), 2)
+        end: addHours(new Date(), 1)
     });
 
-    const onCloseModal = () => {
-        setIsOpen(false);
-    }
+    useEffect(() => {
+        if(activeEvent !== null) {
+            setFormValues({ ...activeEvent });
+        }
+
+    }, [ activeEvent ]);
+
+    const titleClass = useMemo(() => {
+        if(!formSubmitted) return '';
+
+        return (formValues.title.length > 0)
+            ? ''
+            : 'is-invalid'
+
+    }, [ formValues.title, formSubmitted ]);
 
     const onInputChange = ({ target }) => {
         setFormValues({
             ...formValues,
             [target.name]: target.value
-        })
+        });
     }
 
     const onDateChange = (event, changing) => {
         setFormValues({
             ...formValues,
             [changing]: event
-        })
+        });
+    }
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        setFormSubmitted(true);
+
+        const difference = differenceInSeconds(formValues.end, formValues.start)
+        
+        if(isNaN(difference) || difference <= 0) {
+            Swal.fire(
+                'Something went wrong with the dates', 
+                'Please ensure the start date is before the end date', 
+                'error'
+            );
+
+            return;
+        }
+
+        if(formValues.title.length <= 0) return;
+
     }
 
     return (
         <Modal
-            isOpen={ isOpen }
-            onRequestClose={ onCloseModal }
+            isOpen={ isDateModalOpen }
+            onRequestClose={ closeDateModal }
             style={ customStyles }
             className="modal"
             overlayClassName="modal-fondo"
@@ -59,16 +97,17 @@ export const CalendarModal = () => {
             <h1>New event</h1>
             <hr />
             
-            <form className="container">
+            <form className="container" onSubmit={ onSubmit }>
                 <div className="form-group mb-2">
                     <label>Start</label>
 
                     <div className="customDatePickerWidth">
                         <DatePicker 
-                            selected={ formValues.end }
-                            onChange={ (event) => onDateChange(event, 'end') }
+                            selected={ formValues.start }
+                            onChange={ (event) => onDateChange(event, 'start') }
                             dateFormat="Pp"
                             className="form-control"
+                            showTimeSelect
                         />
                     </div>
                 </div>
@@ -83,6 +122,7 @@ export const CalendarModal = () => {
                             onChange={ (event) => onDateChange(event, 'end') }
                             dateFormat="Pp"
                             className="form-control"
+                            showTimeSelect
                         />
                     </div>
                 </div>
@@ -93,7 +133,7 @@ export const CalendarModal = () => {
                     <label className="mb-2">Title and notes</label>
                     <input 
                         type="text" 
-                        className="form-control"
+                        className={`form-control ${ titleClass }`}
                         placeholder="Event title"
                         name="title"
                         autoComplete="off"
