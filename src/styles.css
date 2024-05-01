@@ -45,3 +45,13 @@
 .customDatePickerWidth > div > div.react-datepicker__input-container input {
    width: 100%;
 }
+
+/* Fabs */
+.fab {
+    border-radius: 100%;
+    bottom: 25px;
+    font-size: 30px;
+    padding: 20px;
+    position: fixed;
+    right: 25px;
+}
