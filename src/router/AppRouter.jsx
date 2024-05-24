@@ -15,8 +15,10 @@ export const AppRouter = () => {
 
     if(status === 'checking') {
         return (
-            <h3>Loading...</h3>
-        )
+            <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+                <h3 className="text-primary">Loading...</h3>
+            </div>
+        );
     }
 
     return (
