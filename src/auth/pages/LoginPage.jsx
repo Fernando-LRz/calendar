@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
+import Swal from 'sweetalert2';
+
 import { useAuthStore, useForm } from '../../hooks';
 import './LoginPage.css';
-import Swal from 'sweetalert2';
 
 const loginFormFields = {
     loginEmail: '',
@@ -17,7 +18,7 @@ const signUpFormFields = {
 
 export const LoginPage = () => {
 
-    const { startLogin, errorMessage } = useAuthStore();
+    const { startLogin, startSignUp, errorMessage } = useAuthStore();
 
     const { 
         loginEmail, 
@@ -40,7 +41,18 @@ export const LoginPage = () => {
 
     const signUpSubmit = (event) => {
         event.preventDefault();
-        console.log({ signUpName, signUpEmail, signUpPassword, signUpConfirmedPassword });
+
+        if(signUpPassword !== signUpConfirmedPassword) {
+            Swal.fire('Sign Up Error', 'Passwords do not match', 'error');
+            return;
+        }
+
+        if(signUpPassword.length < 6) {
+            Swal.fire('Sign Up Error', 'The password must be at least 6 characters long', 'error');
+            return;
+        }
+
+        startSignUp({ name: signUpName, email: signUpEmail, password: signUpPassword });
     }
 
     useEffect(() => {

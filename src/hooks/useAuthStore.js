@@ -4,7 +4,7 @@ import { clearErrorMessage, onChecking, onLogin, onLogout } from '../store';
 import { calendarApi } from '../api';
 
 export const useAuthStore = () => {
-
+    
     const { status, user, errorMessage } = useSelector(state => state.auth);
     const dispatch = useDispatch();
 
@@ -21,6 +21,30 @@ export const useAuthStore = () => {
             
         } catch (error) {
             // console.log(error);
+
+            const { response: { data } } = error;
+            dispatch( onLogout(data.msg) );
+
+            setTimeout(() => {
+                dispatch( clearErrorMessage() );
+            }, 10);
+        }
+    }
+
+    const startSignUp = async({ name, email, password }) => {
+        dispatch( onChecking() );
+
+        try {
+            const { data } = await calendarApi.post('/auth/signup', { name, email, password });
+
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('token-init-date', new Date().getTime());
+
+            dispatch( onLogin({ name: data.name, uid: data.uid }) );
+            
+        } catch (error) {
+            // console.log(error);
+
             const { response: { data } } = error;
             dispatch( onLogout(data.msg) );
 
@@ -36,5 +60,6 @@ export const useAuthStore = () => {
         user,
 
         startLogin,
+        startSignUp
     }
 }
