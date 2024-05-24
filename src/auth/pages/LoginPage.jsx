@@ -1,17 +1,68 @@
+import { useEffect } from 'react';
+import { useAuthStore, useForm } from '../../hooks';
 import './LoginPage.css';
+import Swal from 'sweetalert2';
+
+const loginFormFields = {
+    loginEmail: '',
+    loginPassword: ''
+}
+
+const signUpFormFields = {
+    signUpName: '',
+    signUpEmail: '',
+    signUpPassword: '',
+    signUpConfirmedPassword: ''
+}
 
 export const LoginPage = () => {
+
+    const { startLogin, errorMessage } = useAuthStore();
+
+    const { 
+        loginEmail, 
+        loginPassword, 
+        onInputChange: onLoginInputChange
+    } = useForm(loginFormFields);
+    
+    const { 
+        signUpName,
+        signUpEmail, 
+        signUpPassword, 
+        signUpConfirmedPassword,
+        onInputChange: onSignUpInputChange 
+    } = useForm(signUpFormFields);
+
+    const loginSubmit = (event) => {
+        event.preventDefault();
+        startLogin({ email: loginEmail, password: loginPassword });
+    }
+
+    const signUpSubmit = (event) => {
+        event.preventDefault();
+        console.log({ signUpName, signUpEmail, signUpPassword, signUpConfirmedPassword });
+    }
+
+    useEffect(() => {
+        if(errorMessage !== undefined) {
+            Swal.fire('Authentication Error', errorMessage, 'error');
+        }
+    }, [ errorMessage ]);
+
     return (
         <div className="container login-container">
             <div className="row">
                 <div className="col-md-6 login-form-1">
                     <h3>Log in</h3>
-                    <form>
+                    <form onSubmit={ loginSubmit }>
                         <div className="form-group mb-2">
                             <input 
                                 type="text"
                                 className="form-control"
                                 placeholder="Email"
+                                name="loginEmail"
+                                value={ loginEmail }
+                                onChange={ onLoginInputChange }
                             />
                         </div>
                         <div className="form-group mb-2">
@@ -19,6 +70,9 @@ export const LoginPage = () => {
                                 type="password"
                                 className="form-control"
                                 placeholder="Password"
+                                name="loginPassword"
+                                value={ loginPassword }
+                                onChange={ onLoginInputChange }
                             />
                         </div>
                         <div className="d-grid gap-2">
@@ -33,12 +87,15 @@ export const LoginPage = () => {
 
                 <div className="col-md-6 login-form-2">
                     <h3>Sign up</h3>
-                    <form>
+                    <form onSubmit={ signUpSubmit }>
                         <div className="form-group mb-2">
                             <input
                                 type="text"
                                 className="form-control"
                                 placeholder="Name"
+                                name="signUpName"
+                                value={ signUpName }
+                                onChange={ onSignUpInputChange }
                             />
                         </div>
                         <div className="form-group mb-2">
@@ -46,13 +103,19 @@ export const LoginPage = () => {
                                 type="email"
                                 className="form-control"
                                 placeholder="Email"
+                                name="signUpEmail"
+                                value={ signUpEmail }
+                                onChange={ onSignUpInputChange }
                             />
                         </div>
                         <div className="form-group mb-2">
                             <input
                                 type="password"
                                 className="form-control"
-                                placeholder="Password" 
+                                placeholder="Password"
+                                name="signUpPassword"
+                                value={ signUpPassword }
+                                onChange={ onSignUpInputChange }
                             />
                         </div>
 
@@ -61,6 +124,9 @@ export const LoginPage = () => {
                                 type="password"
                                 className="form-control"
                                 placeholder="Confirm your password" 
+                                name="signUpConfirmedPassword"
+                                value={ signUpConfirmedPassword }
+                                onChange={ onSignUpInputChange }
                             />
                         </div>
 
