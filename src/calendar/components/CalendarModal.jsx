@@ -8,6 +8,7 @@ import Swal from 'sweetalert2'
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { useCalendarStore, useUiStore } from '../../hooks';
+import { getEnvVariables } from '../../helpers';
 
 const customStyles = {
     content: {
@@ -20,7 +21,9 @@ const customStyles = {
     }
 };
 
-Modal.setAppElement('#root');
+if( getEnvVariables().VITE_MODE !== 'test' ) {
+    Modal.setAppElement('#root');
+}
 
 export const CalendarModal = () => {
 
