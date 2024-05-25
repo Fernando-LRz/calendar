@@ -1,9 +1,9 @@
 import { Provider } from 'react-redux';
 import { renderHook, act } from '@testing-library/react';
+import { configureStore } from '@reduxjs/toolkit';
 
 import { useUiStore } from '../../src/hooks';
 import { uiSlice } from '../../src/store';
-import { configureStore } from '@reduxjs/toolkit';
 
 const getMockStore = (initialState) => {
     return configureStore({
@@ -30,8 +30,8 @@ describe('useUiStore tests', () => {
 
         expect( result.current ).toEqual({
             isDateModalOpen: false,
-            closeDateModal: expect.any( Function ),
-            openDateModal: expect.any( Function ),
+            closeDateModal: expect.any(Function),
+            openDateModal: expect.any(Function),
         });
     });
 
